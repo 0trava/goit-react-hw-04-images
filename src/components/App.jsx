@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useState } from 'react'; // пакети для роботи зі станом
 import {Searchbar} from './Searchbar/Searchbar';
 import {ImageGallery} from './ImageGallery/ImageGallery';
 import {Loader} from './Loader/Loader';
@@ -6,126 +6,124 @@ import {Button} from './Button/Button';
 import {Modal} from './Modal/Modal';
 
 
-
-const MY_API_KEY = '33995663-3283b38da6c47940fd5e67885'; // мій персональний ключ з pixabay
-const BASE_URL = 'https://pixabay.com/api/';
+let largeImageURL ="";
+let alt = "";
 let PHOTO_NAME ="";
 let showBtn = false;
 
 
-export class App extends Component {
 
-  state = {
-    imagelist: [],
-    page: 1,
-    filter: '',
-    loading: false,
-    showModal: false,
 
-  }
+export const App = () => {
+
+const MY_API_KEY = '33995663-3283b38da6c47940fd5e67885'; // мій персональний ключ з pixabay
+const BASE_URL = 'https://pixabay.com/api/';
+const [filter, setFilter] = useState(''); // Хук для filter
+const [loading, setLoading] = useState(false); // Хук для loading
+const [showModal, setShowModal] =useState(false); // Хук для showModal
+const [page, setPage] = useState(1); // Хук для page
+const [imageList, setImageList] = useState('');
+
+// let imagelist = {};
 
 
 
 
 // INPUT - зберігаємо данні при вводі текста в input
-handleChange = (event) => {
-  const {name, value} = event.currentTarget;
-  this.setState({[name]: value});
+const handleChange = (event) => {
+  setFilter(event.currentTarget.value)
 }
 
 // FILTER - запуск команди пошуку
-searchBtnClick = (e) => {
+const searchBtnClick = (e) => {
   e.preventDefault(); // Зупиняємо оновлення сторінки
-  PHOTO_NAME = this.state.filter.trim(); // Зберігаємо значення filter
+  PHOTO_NAME = filter.trim(); // Зберігаємо значення filter
 
 
-  this.setState({imagelist: []}); // Чистемо сторінку
-  this.setState({totalHits: 0});// Скидаємо лічильник
-  this.setState({page: 2});// Оновлюємо номер сторінки
+  setImageList(''); // Чистемо сторінку
+  setPage(2);// Оновлюємо номер сторінки
   showBtn = false;// Ховаємо кнопку
   
 
-  if (this.state.filter.trim() === ''){
+  if (filter.trim() === ''){
     alert(`Filter window is empty`);
     return;
   } else {
 
-    this.setState({loading: true});// Запуcкаємо Лоадер
+    setLoading(true);// Запуcкаємо Лоадер
     // отримаємо данні з сервера
     fetch (`${BASE_URL}?q=${PHOTO_NAME}&page=1&key=${MY_API_KEY}&image_type=photo&orientation=horizontal&per_page=12`)
     .then(res => res.json())
-    .then (imagelist => this.setState({imagelist}))
-    .finally(() => this.setState({loading: false}));// Зупиняємо Лоадер
+    .then (image => setImageList(image))
+    .finally(() => setLoading(false));// Зупиняємо Лоадер
 
-    this.setState( { filter: ''}); // очищення вмісту форми
+    setFilter(""); // очищення вмісту форми
   }
   };
 
 // LOAD MORE - дозавантиження 
-clickLoadMore = (e) =>  {
+const clickLoadMore = (e) =>  {
   e.preventDefault(); // Зупиняємо оновлення сторінки
-  this.setState({page: this.state.page+1}); // Додаємо значення сторінки +1
+  setPage(page => page + 1); // Додаємо значення сторінки +1
 
    // ПЕРЕВІРКА - чи є ще сторінка для дозавантаження
-    if ( this.state.imagelist.total > this.state.imagelist.hits.length){
-      this.setState({loading: true});// Запуcкаємо Лоадер
+    if ( imageList.total > imageList.hits.length){
+      setLoading(true);// Запуcкаємо Лоадер
       // отримаємо данні з сервера
-      fetch (`${BASE_URL}?q=${PHOTO_NAME}&page=1&key=${MY_API_KEY}&image_type=photo&orientation=horizontal&per_page=${this.state.page*12}`)
+      fetch (`${BASE_URL}?q=${PHOTO_NAME}&page=1&key=${MY_API_KEY}&image_type=photo&orientation=horizontal&per_page=${page*12}`)
       .then(res => res.json())
-      .then (imagelist => this.setState({imagelist}))
-      .finally(() => this.setState({loading: false}))// Зупиняємо Лоадер
+      .then (image => setImageList(image))
+      .finally(() => setLoading(false));// Зупиняємо Лоадер
     } 
 
 }
 
 // OPEN MODAL  - відкриття модалки
-openModal = (largeImageURL, alt) => {
-  this.setState(({ showModal }) => {
-    return { showModal: !showModal, largeImageURL, alt };
-  });
+const openModal = (getlargeImageURL, getAlt) => {
+    setShowModal(true);
+    largeImageURL = getlargeImageURL;
+    alt = getAlt;
+    return { showModal, largeImageURL, alt };
 };
 
 // CLOSE MODAL  - Закриття модалки
-closeModal = () => {
-  this.setState(({ showModal }) => {
-    return { showModal: !showModal };
-  });
+const closeModal = () => {
+    setShowModal(false);
+    return { showModal };
+
 };
 
 // ПЕРЕВІРКА для кнопки Load more (відображаємо чи ні)
-checkBtnLoad = () =>{
-  if (this.state.imagelist.hits) {
-    if (this.state.imagelist.total > this.state.imagelist.hits.length ) {
+const checkBtnLoad = () =>{
+  if (imageList.hits) {
+    if (imageList.total > imageList.hits.length ) {
       showBtn = true;
     } else { 
       showBtn = false;
     };
   }
-
 }
 
+checkBtnLoad()
 // РЕНДНЕРІНГ сторінки
-  render(){
-    const {filter, imagelist, loading, showModal, largeImageURL, alt } = this.state;
-    this.checkBtnLoad()
+
 
 
     return (
       <div>
         <section>
-          <Searchbar filter={filter} handleChange={this.handleChange} searchBtnClick={this.searchBtnClick}/>
+          <Searchbar filter={filter} handleChange={handleChange} searchBtnClick={searchBtnClick}/>
         </section>
         <section>
-        {imagelist && (<ImageGallery  imagelist={imagelist.hits} openModal={this.openModal}/>)}
+        {imageList && (<ImageGallery  imagelist={imageList.hits} openModal={openModal}/>)}
               { loading && (<Loader/>) }
-              { showBtn && (<Button clickLoadMore={this.clickLoadMore}/>) }
+              { showBtn && (<Button clickLoadMore={clickLoadMore}/>) }
         </section>
         {showModal && (
-          <Modal closeModal={this.closeModal} src={largeImageURL} alt={alt}/>
+          <Modal closeModal={closeModal} src={largeImageURL} alt={alt}/>
         )}
           
       </div>
      );
-  }
 
 };
