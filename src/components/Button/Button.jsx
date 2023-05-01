@@ -1,4 +1,5 @@
 import css from './Button.module.css'; // імпортуємо стилі
+import PropTypes from 'prop-types'; // типизація пропсів
 
 // Функціональний компонент, який відповідає за кнопку "Load more".
 export const Button = ({clickLoadMore}) => {
@@ -7,4 +8,8 @@ export const Button = ({clickLoadMore}) => {
       Load more
     </button>
   );
+};
+
+Button.propTypes = {
+  clickLoadMore: PropTypes.func.isRequired // функція
 };

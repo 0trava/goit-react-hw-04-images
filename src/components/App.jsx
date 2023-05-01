@@ -1,30 +1,25 @@
-import { useState } from 'react'; // пакети для роботи зі станом
+import {useState } from 'react'; // пакети для роботи зі станом
 import {Searchbar} from './Searchbar/Searchbar';
 import {ImageGallery} from './ImageGallery/ImageGallery';
 import {Loader} from './Loader/Loader';
 import {Button} from './Button/Button';
 import {Modal} from './Modal/Modal';
 
-
+const MY_API_KEY = '33995663-3283b38da6c47940fd5e67885'; // мій персональний ключ з pixabay
+const BASE_URL = 'https://pixabay.com/api/';
 let largeImageURL ="";
 let alt = "";
 let PHOTO_NAME ="";
 let showBtn = false;
 
-
-
-
 export const App = () => {
 
-const MY_API_KEY = '33995663-3283b38da6c47940fd5e67885'; // мій персональний ключ з pixabay
-const BASE_URL = 'https://pixabay.com/api/';
+
 const [filter, setFilter] = useState(''); // Хук для filter
 const [loading, setLoading] = useState(false); // Хук для loading
 const [showModal, setShowModal] =useState(false); // Хук для showModal
 const [page, setPage] = useState(1); // Хук для page
 const [imageList, setImageList] = useState('');
-
-// let imagelist = {};
 
 
 

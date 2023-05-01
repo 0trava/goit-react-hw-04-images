@@ -11,7 +11,7 @@ export const ImageGalleryItem = ({imagelist, openModal}) => {
           <li 
               key={item.id}  
               // onClick={openModal}
-              onClick={(evt)=>{openModal(item.largeImageURL, item.tags);}}
+              onClick={()=>{openModal(item.largeImageURL, item.tags);}}
               className={css.galleryItem}>
             <img
               id={item.id} 
